@@ -1,0 +1,9 @@
+.App {
+  text-align: center;
+}
+
+.tweet {
+  border: 1px solid black;
+  display: inline-block;
+  margin-bottom: 10px;
+}
