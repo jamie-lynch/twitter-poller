@@ -6,14 +6,19 @@ class App extends Component {
     super(props)
 
     this.getTweets = this.getTweets.bind(this)
+    this.togglePoll = this.togglePoll.bind(this)
     this.handleChange = this.handleChange.bind(this)
 
     this.state = {
+      // Available values: 'Start' | 'Stop'
+      buttonState: 'Start',
       leftTweets: null,
       rightTweets: null,
       leftHashtag: '',
       rightHashtag: ''
     }
+
+    this.updateInterval = null
   }
 
   getTweets() {
@@ -36,6 +41,20 @@ class App extends Component {
       .end((err, res) => {
         this.setState({ rightTweets: res.body.statuses })
       })
+  }
+
+  togglePoll() {
+    this.setState(prevState => {
+      if (prevState.buttonState === 'Start') {
+        this.updateInterval = window.setInterval(() => {
+          this.getTweets()
+        }, 5000)
+        return { buttonState: 'Stop' }
+      } else {
+        window.clearInterval(this.updateInterval)
+        return { buttonState: 'Start' }
+      }
+    })
   }
 
   handleChange(event) {
@@ -67,6 +86,7 @@ class App extends Component {
                   aria-label="leftHashtag"
                   aria-describedby="basic-addon1"
                   onChange={this.handleChange}
+                  disabled={this.state.buttonState === 'Stop'}
                 />
               </div>
             </div>
@@ -74,10 +94,13 @@ class App extends Component {
             <div className="col-sm-2">
               <button
                 className="btn btn-primary"
-                disabled={!this.state.leftHashtag || !this.state.rightHashtag}
-                onClick={this.getTweets}
+                disabled={
+                  this.state.buttonState === 'Start' &&
+                  (!this.state.leftHashtag || !this.state.rightHashtag)
+                }
+                onClick={this.togglePoll}
               >
-                Start
+                {this.state.buttonState}
               </button>
             </div>
 
@@ -97,6 +120,7 @@ class App extends Component {
                   aria-label="rightHashtag"
                   aria-describedby="basic-addon1"
                   onChange={this.handleChange}
+                  disabled={this.state.buttonState === 'Stop'}
                 />
               </div>
             </div>
