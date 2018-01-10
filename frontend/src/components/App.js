@@ -1,57 +1,74 @@
 import React, { Component } from 'react'
 import request from 'superagent'
+import moment from 'moment'
 
 class App extends Component {
   constructor(props) {
     super(props)
 
-    this.getTweets = this.getTweets.bind(this)
-    this.togglePoll = this.togglePoll.bind(this)
+    this.getPollData = this.getPollData.bind(this)
+    this.handleClick = this.handleClick.bind(this)
     this.handleChange = this.handleChange.bind(this)
+    this.startPoll = this.startPoll.bind(this)
+    this.endPoll = this.endPoll.bind(this)
 
     this.state = {
       // Available values: 'Start' | 'Stop'
       buttonState: 'Start',
       leftTweets: null,
       rightTweets: null,
+      leftCount: 0,
+      rightCount: 0,
       leftHashtag: '',
-      rightHashtag: ''
+      rightHashtag: '',
+      started_at: null
     }
 
     this.updateInterval = null
   }
 
-  getTweets() {
-    if (!this.state.leftHashtag) {
-      return this.setState({ leftTweets: null })
-    }
+  getPollData() {
     request
-      .get(`//${process.env.REACT_APP_BACKEND_API}/get-tweets`)
-      .query({ hashtag: this.state.leftHashtag })
+      .get(`//${process.env.REACT_APP_BACKEND_API}/get-poll-data`)
+      .query({ tweets: true })
       .end((err, res) => {
-        this.setState({ leftTweets: res.body.statuses })
-      })
-
-    if (!this.state.rightHashtag) {
-      return this.setState({ rightTweets: null })
-    }
-    request
-      .get(`//${process.env.REACT_APP_BACKEND_API}/get-tweets`)
-      .query({ hashtag: this.state.rightHashtag })
-      .end((err, res) => {
-        this.setState({ rightTweets: res.body.statuses })
+        this.setState({ ...res.body })
       })
   }
 
-  togglePoll() {
+  startPoll() {
+    request
+      .post(`//${process.env.REACT_APP_BACKEND_API}/start-poll`)
+      .set({ 'Content-Type': 'application/json' })
+      .send({
+        leftHashtag: this.state.leftHashtag,
+        rightHashtag: this.state.rightHashtag
+      })
+      .end((err, res) => {
+        this.updateInterval = window.setInterval(() => {
+          this.getPollData()
+        }, 10000)
+        return
+      })
+  }
+
+  endPoll() {
+    request
+      .post(`//${process.env.REACT_APP_BACKEND_API}/stop-poll`)
+      .end((err, res) => {
+        window.clearInterval(this.updateInterval)
+        this.updateInterval = null
+        return
+      })
+  }
+
+  handleClick() {
     this.setState(prevState => {
       if (prevState.buttonState === 'Start') {
-        this.updateInterval = window.setInterval(() => {
-          this.getTweets()
-        }, 5000)
-        return { buttonState: 'Stop' }
+        this.startPoll()
+        return { buttonState: 'Stop', started_at: Date.now() }
       } else {
-        window.clearInterval(this.updateInterval)
+        this.endPoll()
         return { buttonState: 'Start' }
       }
     })
@@ -98,7 +115,7 @@ class App extends Component {
                   this.state.buttonState === 'Start' &&
                   (!this.state.leftHashtag || !this.state.rightHashtag)
                 }
-                onClick={this.togglePoll}
+                onClick={this.handleClick}
               >
                 {this.state.buttonState}
               </button>
@@ -127,6 +144,28 @@ class App extends Component {
           </div>
 
           <div className="row">
+            <div className="col-sm-5" />
+            <div className="col-sm-2">
+              {this.state.buttonState === 'Stop' && (
+                <span>
+                  Started At: {moment(this.state.started_at).format('H:m:s')}
+                </span>
+              )}
+            </div>
+            <div className="col-sm-5" />
+          </div>
+
+          <div className="row">
+            <div className="col-sm-5">
+              <div>Count: {this.state.leftCount}</div>
+            </div>
+            <div className="col-sm-2" />
+            <div className="col-sm-5">
+              <div>Count: {this.state.rightCount}</div>
+            </div>
+          </div>
+
+          <div className="row">
             <div className="col-sm-5">
               {this.state.leftTweets &&
                 (this.state.leftTweets.length ? (
@@ -134,9 +173,11 @@ class App extends Component {
                     return (
                       <div key={tweet.id}>
                         <div className="tweet">
+                          <div>ID: {tweet.id}</div>
                           <div>Name: {tweet.user.name}</div>
                           <div>Handle: {tweet.user.screen_name}</div>
                           <div>Text: {tweet.text}</div>
+                          <div>Created: {tweet.created_at}</div>
                         </div>
                       </div>
                     )
@@ -153,9 +194,11 @@ class App extends Component {
                     return (
                       <div key={tweet.id}>
                         <div className="tweet">
+                          <div>ID: {tweet.id}</div>
                           <div>Name: {tweet.user.name}</div>
                           <div>Handle: {tweet.user.screen_name}</div>
                           <div>Text: {tweet.text}</div>
+                          <div>Created: {tweet.created_at}</div>
                         </div>
                       </div>
                     )

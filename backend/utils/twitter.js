@@ -16,10 +16,15 @@ exports.createTwitterClient = function(server) {
  * @param  {string} hashtag A hashtag to search for, without the leading #
  * @return {array}         An array of tweets in the format described at https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets
  */
-exports.getTweets = function(hashtag) {
+exports.getTweets = function(hashtag, since_id = null) {
   return new Promise((resolve, reject) => {
+    let options = { q: `#${hashtag}`, result_type: 'recent', count: 100 }
+    if (since_id) {
+      options.since_id = since_id
+    }
+
     client
-      .get('search/tweets', { q: `#${hashtag}` })
+      .get('search/tweets', options)
       .then(tweets => {
         return resolve(tweets)
       })
