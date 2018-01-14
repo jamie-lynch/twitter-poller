@@ -1,6 +1,7 @@
 var twitter = require('./twitter')
 
 var poller
+var stop = false
 
 const startPoll = (leftHashtag, rightHashtag) => {
   return new Promise((resolve, reject) => {
@@ -16,26 +17,29 @@ const startPoll = (leftHashtag, rightHashtag) => {
         since: null,
         tweets: [],
         count: 0
-      },
-      interval: null
+      }
     }
 
     twitter
       .getTweets(poller.left.hashtag)
       .then(tweets => {
         let statuses = tweets.statuses
-        statuses.sort(sortAscendingOnId)
-        poller.left.since = statuses[statuses.length - 1].id
+        if (statuses.length) {
+          statuses.sort(sortAscendingOnId)
+          poller.left.since = statuses[statuses.length - 1].id
+        }
         return twitter.getTweets(poller.right.hashtag)
       })
       .then(tweets => {
         let statuses = tweets.statuses
-        statuses.sort(sortAscendingOnId)
-        poller.right.since = statuses[statuses.length - 1].id
+        if (statuses.length) {
+          statuses.sort(sortAscendingOnId)
+          poller.right.since = statuses[statuses.length - 1].id
+        }
 
-        poller.interval = setInterval(() => {
+        setTimeout(() => {
           poll()
-        }, 10000)
+        }, 5000)
         return resolve()
       })
       .catch(err => {
@@ -45,8 +49,7 @@ const startPoll = (leftHashtag, rightHashtag) => {
 }
 
 const stopPoll = () => {
-  clearInterval(poller.interval)
-  poller.interval = null
+  stop = true
 }
 
 const getPollData = (tweets = false) => {
@@ -94,18 +97,41 @@ const processTweets = (tweets, left = true) => {
 }
 
 const poll = () => {
-  twitter
-    .getTweets(poller.left.hashtag, poller.left.since)
+  if (stop) {
+    return
+  }
+  return fetchData(poller.left.hashtag, poller.left.since)
     .then(tweets => {
       processTweets(tweets, true)
-      return twitter.getTweets(poller.right.hashtag, poller.right.since)
+      return fetchData(poller.right.hashtag, poller.right.since)
     })
     .then(tweets => {
-      return processTweets(tweets, false)
+      processTweets(tweets, false)
+      setTimeout(() => {
+        poll()
+      }, 10000)
+      return
     })
     .catch(err => {
       console.error(err.message)
     })
+}
+
+const fetchData = (hashtag, since) => {
+  let statuses = []
+
+  var getPage = (hashtag = null, since = null, next_results = null) => {
+    return twitter.getTweets(hashtag, since, next_results).then(tweets => {
+      statuses = statuses.concat(tweets.statuses)
+      if (tweets.search_metadata.next_results) {
+        return getPage(null, since, tweets.search_metadata.next_results)
+      } else {
+        return { statuses, search_metadata: tweets.search_metadata }
+      }
+    })
+  }
+
+  return getPage(hashtag, since)
 }
 
 module.exports = {
@@ -114,5 +140,6 @@ module.exports = {
   getPollData,
   sortAscendingOnId,
   processTweets,
-  poll
+  poll,
+  fetchData
 }
