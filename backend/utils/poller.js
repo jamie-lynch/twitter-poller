@@ -1,5 +1,6 @@
 var twitter = require('./twitter')
 var Poll = require('../models/poll')
+var wss = require('./websockets')
 
 var poller
 var stop = true
@@ -44,7 +45,6 @@ const startPoll = (leftHashtag, rightHashtag) => {
         return resolve()
       })
       .catch(err => {
-        console.log(err)
         return reject(err)
       })
   })
@@ -62,7 +62,7 @@ const sortAscendingOnId = (a, b) => {
 const processTweets = (tweets, left = true) => {
   // If there haven't been any tweets then just return
   if (!tweets.statuses.length) {
-    return
+    return []
   }
 
   // Sort the tweets in ascending order based on id
@@ -79,10 +79,11 @@ const processTweets = (tweets, left = true) => {
 
   // If there are still some tweets then process the data
   if (statuses.length) {
-    return statuses
     data.since = statuses[statuses.length - 1].id
     left ? (poller.left = data) : (poller.right = data)
+    return statuses
   }
+  return []
 }
 
 const poll = () => {
@@ -99,6 +100,7 @@ const poll = () => {
     })
     .then(tweets => {
       right = processTweets(tweets, false)
+      wss.broadcastChange(left, right)
       return Poll.modify(left, right)
     })
     .then(() => {

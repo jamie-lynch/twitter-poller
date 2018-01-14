@@ -9,11 +9,11 @@ class App extends Component {
   constructor(props) {
     super(props)
 
-    this.getPollData = this.getPollData.bind(this)
     this.handleClick = this.handleClick.bind(this)
     this.handleChange = this.handleChange.bind(this)
     this.startPoll = this.startPoll.bind(this)
     this.endPoll = this.endPoll.bind(this)
+    this.listen = this.listen.bind(this)
 
     this.state = {
       // Available values: 'Start' | 'Stop'
@@ -26,17 +26,26 @@ class App extends Component {
       rightHashtag: '',
       started_at: null
     }
-
-    this.updateInterval = null
   }
 
-  getPollData() {
-    request
-      .get(`//${process.env.REACT_APP_BACKEND_API}/get-poll-data`)
-      .query({ tweets: true })
-      .end((err, res) => {
-        this.setState({ ...res.body })
+  componentDidMount() {
+    this.ws = new window.WebSocket(`ws://${process.env.REACT_APP_BACKEND_API}`)
+    this.listen(this.ws)
+  }
+
+  listen(ws) {
+    ws.onmessage = received => {
+      var msg = JSON.parse(received.data)
+
+      this.setState(prevState => {
+        return {
+          leftTweets: prevState.leftTweets.concat(msg.newLeftTweets),
+          rightTweets: prevState.rightTweets.concat(msg.newRightTweets),
+          leftCount: (prevState.leftCount += msg.newLeftTweets.length),
+          rightCount: (prevState.rightCount += msg.newRightTweets.length)
+        }
       })
+    }
   }
 
   startPoll() {
@@ -48,9 +57,6 @@ class App extends Component {
         rightHashtag: this.state.rightHashtag
       })
       .end((err, res) => {
-        this.updateInterval = window.setInterval(() => {
-          this.getPollData()
-        }, 10000)
         return
       })
   }
@@ -59,8 +65,6 @@ class App extends Component {
     request
       .post(`//${process.env.REACT_APP_BACKEND_API}/stop-poll`)
       .end((err, res) => {
-        window.clearInterval(this.updateInterval)
-        this.updateInterval = null
         return
       })
   }

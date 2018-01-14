@@ -7,6 +7,7 @@
 var app = require('../app')
 var debug = require('debug')('backend:server')
 var http = require('http')
+var wss = require('../utils/websockets')
 
 /**
  * Get port from environment and store in Express.
@@ -20,6 +21,11 @@ app.set('port', port)
  */
 
 var server = http.createServer(app)
+
+/**
+ * Create WS server.
+ */
+wss.createWebSocketServer(server)
 
 /**
  * Listen on provided port, on all network interfaces.
