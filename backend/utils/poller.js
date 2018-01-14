@@ -2,28 +2,37 @@ var twitter = require('./twitter')
 
 var poller
 
-exports.startPoll = (leftHashtag, rightHashtag) => {
+const startPoll = (leftHashtag, rightHashtag) => {
   return new Promise((resolve, reject) => {
     poller = {
-      leftHashtag,
-      rightHashtag,
-      leftSince: null,
-      rightSince: null,
-      leftTweets: [],
-      rightTweets: [],
-      leftCount: null,
-      rightCount: null,
+      left: {
+        hashtag: leftHashtag,
+        since: null,
+        tweets: [],
+        count: 0
+      },
+      right: {
+        hashtag: rightHashtag,
+        since: null,
+        tweets: [],
+        count: 0
+      },
       interval: null
     }
 
     twitter
-      .getTweets(poller.leftHashtag)
+      .getTweets(poller.left.hashtag)
       .then(tweets => {
-        poller.leftSince = tweets.statuses[0].id
-        return twitter.getTweets(poller.rightHashtag)
+        let statuses = tweets.statuses
+        statuses.sort(sortAscendingOnId)
+        poller.left.since = statuses[statuses.length - 1].id
+        return twitter.getTweets(poller.right.hashtag)
       })
       .then(tweets => {
-        poller.rightSince = tweets.statuses[0].id
+        let statuses = tweets.statuses
+        statuses.sort(sortAscendingOnId)
+        poller.right.since = statuses[statuses.length - 1].id
+
         poller.interval = setInterval(() => {
           poll()
         }, 10000)
@@ -35,61 +44,75 @@ exports.startPoll = (leftHashtag, rightHashtag) => {
   })
 }
 
-exports.stopPoll = () => {
+const stopPoll = () => {
   clearInterval(poller.interval)
   poller.interval = null
 }
 
-exports.getPollData = (tweets = false) => {
+const getPollData = (tweets = false) => {
   var data = {
-    leftCount: poller.leftCount || 0,
-    rightCount: poller.rightCount || 0
+    leftCount: poller.left.count || 0,
+    rightCount: poller.right.count || 0
   }
   if (tweets) {
-    data.leftTweets = poller.leftTweets
-    data.rightTweets = poller.rightTweets
+    data.leftTweets = poller.left.tweets
+    data.rightTweets = poller.right.tweets
   }
 
   return data
 }
 
-var poll = () => {
-  twitter
-    .getTweets(poller.leftHashtag, poller.leftSince)
-    .then(tweets => {
-      if (!tweets.statuses.length) {
-        return twitter.getTweets(poller.rightHashtag, poller.rightSince)
-      }
+const sortAscendingOnId = (a, b) => {
+  return a.id - b.id
+}
 
-      if (tweets.statuses[tweets.statuses.length - 1].id === poller.leftSince) {
-        tweets.statuses.splice(-1, 1)
-      }
-      if (tweets.statuses.length) {
-        poller.leftCount += tweets.statuses.length
-        poller.leftTweets = poller.leftTweets.concat(tweets.statuses)
-        poller.leftSince = tweets.statuses[0].id
-      }
-      return twitter.getTweets(poller.rightHashtag, poller.rightSince)
+const processTweets = (tweets, left = true) => {
+  // If there haven't been any tweets then just return
+  if (!tweets.statuses.length) {
+    return
+  }
+
+  // Sort the tweets in ascending order based on id
+  let statuses = tweets.statuses
+  statuses.sort(sortAscendingOnId)
+
+  // Take a copy of the data for the relevant side
+  let data = Object.assign({}, left ? poller.left : poller.right)
+
+  // If a tweet matching the since id is found, then remove it
+  if (statuses[0].id === data.since) {
+    statuses.splice(0, 1)
+  }
+
+  // If there are still some tweets then process the data
+  if (statuses.length) {
+    data.count += tweets.statuses.length
+    data.tweets = data.tweets.concat(tweets.statuses)
+    data.since = statuses[statuses.length - 1].id
+    left ? (poller.left = data) : (poller.right = data)
+  }
+}
+
+const poll = () => {
+  twitter
+    .getTweets(poller.left.hashtag, poller.left.since)
+    .then(tweets => {
+      processTweets(tweets, true)
+      return twitter.getTweets(poller.right.hashtag, poller.right.since)
     })
     .then(tweets => {
-      if (!tweets.statuses.length) {
-        return
-      }
-
-      if (
-        tweets.statuses[tweets.statuses.length - 1].id === poller.rightSince
-      ) {
-        tweets.statuses.splice(-1, 1)
-      }
-
-      if (tweets.statuses.length) {
-        poller.rightCount += tweets.statuses.length
-        poller.rightTweets = poller.rightTweets.concat(tweets.statuses)
-        poller.rightSince = tweets.statuses[0].id
-      }
-      return
+      return processTweets(tweets, false)
     })
     .catch(err => {
       console.error(err.message)
     })
+}
+
+module.exports = {
+  startPoll,
+  stopPoll,
+  getPollData,
+  sortAscendingOnId,
+  processTweets,
+  poll
 }
