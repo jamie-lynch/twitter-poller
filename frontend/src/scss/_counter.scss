@@ -1,0 +1,17 @@
+.counter {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1em;
+}
+
+.counter-text {
+  color: $gray-700;
+}
+
+.counter-value {
+  font-weight: bold;
+  font-size: 24px;
+}

@@ -1,16 +1,3 @@
-body {
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif; }
-
-.App {
-  text-align: center; }
-
-.tweet {
-  border: 1px solid black;
-  display: inline-block;
-  margin-bottom: 10px; }
-
 /*!
  * Bootstrap v4.0.0-beta.3 (https://getbootstrap.com)
  * Copyright 2011-2017 The Bootstrap Authors
@@ -6014,3 +6001,64 @@ a.text-dark:focus, a.text-dark:hover {
   .table-bordered th,
   .table-bordered td {
     border: 1px solid #ddd !important; } }
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  background-color: #f8f9fa; }
+
+.tweet {
+  border: 1px solid #e1e8ed;
+  border-radius: 5px;
+  display: inline-block;
+  background-color: #fff;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 1em; }
+
+.tweet-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center; }
+
+.tweet-user-image {
+  height: 42px;
+  width: 42px;
+  border-radius: 21px; }
+
+.tweet-user-names {
+  font-size: 12px; }
+
+.tweet-user-name {
+  font-weight: bold; }
+
+.tweet-user-username {
+  color: #657786; }
+
+.tweet-logo {
+  color: #1da1f2; }
+
+.tweet-footer {
+  font-size: 10px;
+  color: #aab8c2;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: flex-end; }
+
+.counter {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1em; }
+
+.counter-text {
+  color: #495057; }
+
+.counter-value {
+  font-weight: bold;
+  font-size: 24px; }

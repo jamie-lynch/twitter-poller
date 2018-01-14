@@ -1,0 +1,47 @@
+.tweet {
+  border: 1px solid map-get($twitter, 'extra-light-gray');
+  border-radius: 5px;
+  display: inline-block;
+  background-color: $white;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 1em;
+}
+
+.tweet-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tweet-user-image {
+  height: 42px;
+  width: 42px;
+  border-radius: 21px;
+}
+
+.tweet-user-names {
+  font-size: 12px;
+}
+
+.tweet-user-name {
+  font-weight: bold;
+}
+
+.tweet-user-username {
+  color: map-get($twitter, 'dark-gray');
+}
+
+.tweet-logo {
+  color: map-get($twitter, 'blue');
+}
+
+.tweet-footer {
+  font-size: 10px;
+  color: map-get($twitter, 'light-gray');
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: flex-end;
+}

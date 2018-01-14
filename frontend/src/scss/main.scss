@@ -1,17 +1,5 @@
-body {
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
-}
-
-.App {
-  text-align: center;
-}
-
-.tweet {
-  border: 1px solid black;
-  display: inline-block;
-  margin-bottom: 10px;
-}
-
+@import 'colours';
 @import 'node_modules/bootstrap/scss/bootstrap';
+@import 'general';
+@import 'tweet';
+@import 'counter';
