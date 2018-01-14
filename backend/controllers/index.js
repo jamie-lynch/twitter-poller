@@ -1,12 +1,14 @@
 var poller = require('../utils/poller')
+var Poll = require('../models/poll')
 
 exports.index = function(req, res, next) {
   res.render('index')
 }
 
 exports.getPollData = function(req, res, next) {
-  data = poller.getPollData(req.query.tweets === 'true')
-  return res.status(200).json(data)
+  Poll.get().then(poll => {
+    return res.status(200).json(poll)
+  })
 }
 
 exports.startPoll = function(req, res, next) {
@@ -21,6 +23,7 @@ exports.startPoll = function(req, res, next) {
 }
 
 exports.stopPoll = function(req, res, next) {
-  poller.stopPoll()
-  return res.status(200).json({ success: true })
+  poller.stopPoll().then(() => {
+    return res.status(200).json({ success: true })
+  })
 }

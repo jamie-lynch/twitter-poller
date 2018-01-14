@@ -5,6 +5,7 @@ var logger = require('morgan')
 var cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
 var mongoose = require('mongoose')
+var Poll = require('./models/poll')
 
 // turn .env file into environment variables
 require('dotenv').config()
@@ -12,6 +13,20 @@ require('dotenv').config()
 // setup twitter client
 var twitter = require('./utils/twitter')
 twitter.createTwitterClient()
+
+// connect to db
+mongoose.Promise = require('bluebird')
+mongoose
+  .connect(process.env.DB_ADDRESS, { useMongoClient: true })
+  .catch(err => {
+    console.error(err)
+  })
+
+var db = mongoose.connection
+db.on('error', console.error.bind(console, 'MongoDB connection error:'))
+
+// Create a poll
+Poll.create()
 
 // create an express app
 var app = express()

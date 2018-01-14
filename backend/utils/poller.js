@@ -1,22 +1,19 @@
 var twitter = require('./twitter')
+var Poll = require('../models/poll')
 
 var poller
-var stop = false
+var stop = true
 
 const startPoll = (leftHashtag, rightHashtag) => {
   return new Promise((resolve, reject) => {
     poller = {
       left: {
         hashtag: leftHashtag,
-        since: null,
-        tweets: [],
-        count: 0
+        since: null
       },
       right: {
         hashtag: rightHashtag,
-        since: null,
-        tweets: [],
-        count: 0
+        since: null
       }
     }
 
@@ -37,12 +34,17 @@ const startPoll = (leftHashtag, rightHashtag) => {
           poller.right.since = statuses[statuses.length - 1].id
         }
 
+        return Poll.start(leftHashtag, rightHashtag)
+      })
+      .then(() => {
         setTimeout(() => {
           poll()
         }, 5000)
+        stop = false
         return resolve()
       })
       .catch(err => {
+        console.log(err)
         return reject(err)
       })
   })
@@ -50,19 +52,7 @@ const startPoll = (leftHashtag, rightHashtag) => {
 
 const stopPoll = () => {
   stop = true
-}
-
-const getPollData = (tweets = false) => {
-  var data = {
-    leftCount: poller.left.count || 0,
-    rightCount: poller.right.count || 0
-  }
-  if (tweets) {
-    data.leftTweets = poller.left.tweets
-    data.rightTweets = poller.right.tweets
-  }
-
-  return data
+  return Poll.stop()
 }
 
 const sortAscendingOnId = (a, b) => {
@@ -89,8 +79,7 @@ const processTweets = (tweets, left = true) => {
 
   // If there are still some tweets then process the data
   if (statuses.length) {
-    data.count += tweets.statuses.length
-    data.tweets = data.tweets.concat(tweets.statuses)
+    return statuses
     data.since = statuses[statuses.length - 1].id
     left ? (poller.left = data) : (poller.right = data)
   }
@@ -100,13 +89,19 @@ const poll = () => {
   if (stop) {
     return
   }
+
+  var left = []
+  var right = []
   return fetchData(poller.left.hashtag, poller.left.since)
     .then(tweets => {
-      processTweets(tweets, true)
+      left = processTweets(tweets, true)
       return fetchData(poller.right.hashtag, poller.right.since)
     })
     .then(tweets => {
-      processTweets(tweets, false)
+      right = processTweets(tweets, false)
+      return Poll.modify(left, right)
+    })
+    .then(() => {
       setTimeout(() => {
         poll()
       }, 10000)
@@ -137,7 +132,6 @@ const fetchData = (hashtag, since) => {
 module.exports = {
   startPoll,
   stopPoll,
-  getPollData,
   sortAscendingOnId,
   processTweets,
   poll,
