@@ -9,12 +9,13 @@ class App extends Component {
   constructor(props) {
     super(props)
 
-    this.handleClick = this.handleClick.bind(this)
-    this.handleChange = this.handleChange.bind(this)
+    this.setInitialState = this.setInitialState.bind(this)
+    this.listen = this.listen.bind(this)
     this.startPoll = this.startPoll.bind(this)
     this.endPoll = this.endPoll.bind(this)
-    this.listen = this.listen.bind(this)
-    this.setInitialState = this.setInitialState.bind(this)
+    this.handleClick = this.handleClick.bind(this)
+    this.handleChange = this.handleChange.bind(this)
+    this.sortAndFilter = this.sortAndFilter.bind(this)
 
     this.state = {
       // Available values: 'Start' | 'Stop'
@@ -106,7 +107,15 @@ class App extends Component {
     this.setState({ [event.target.name]: event.target.value })
   }
 
+  sortAndFilter() {
+    let leftTweets = this.state.leftTweets.reverse()
+    let rightTweets = this.state.rightTweets.reverse()
+    return { leftTweets, rightTweets }
+  }
+
   render() {
+    var { leftTweets, rightTweets } = this.sortAndFilter()
+
     let header = (
       <div className="header d-flex flex-column align-items-center mb-4">
         <h1>Twitter Poller</h1>
@@ -199,13 +208,13 @@ class App extends Component {
 
           <div className="row">
             <div className="col-sm-5">
-              {this.state.leftTweets.map(tweet => {
+              {leftTweets.map(tweet => {
                 return <Tweet key={tweet.id} data={tweet} />
               })}
             </div>
             <div className="col-sm-2" />
             <div className="col-sm-5">
-              {this.state.rightTweets.map(tweet => {
+              {rightTweets.map(tweet => {
                 return <Tweet key={tweet.id} data={tweet} />
               })}
             </div>
