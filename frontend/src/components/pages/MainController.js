@@ -3,9 +3,9 @@ import React, { Component } from 'react'
 import request from 'superagent'
 
 // components
-import { Tweet, Counter, Loader } from '../components'
+import { Tweet, Counter, Loader } from '../../components'
 
-class App extends Component {
+class MainController extends Component {
   constructor(props) {
     super(props)
 
@@ -15,6 +15,7 @@ class App extends Component {
     this.endPoll = this.endPoll.bind(this)
     this.handleClick = this.handleClick.bind(this)
     this.handleChange = this.handleChange.bind(this)
+    this.onIconClick = this.onIconClick.bind(this)
     this.sortAndFilter = this.sortAndFilter.bind(this)
 
     this.state = {
@@ -27,7 +28,11 @@ class App extends Component {
       leftHashtag: '',
       rightHashtag: '',
       active: false,
-      loading: true
+      loading: true,
+      tweetLists: {
+        presenter: [],
+        display: []
+      }
     }
   }
 
@@ -51,15 +56,18 @@ class App extends Component {
   listen(ws) {
     ws.onmessage = received => {
       var msg = JSON.parse(received.data)
+      var { type, data } = msg
 
-      this.setState(prevState => {
-        return {
-          leftTweets: prevState.leftTweets.concat(msg.newLeftTweets),
-          rightTweets: prevState.rightTweets.concat(msg.newRightTweets),
-          leftCount: (prevState.leftCount += msg.newLeftTweets.length),
-          rightCount: (prevState.rightCount += msg.newRightTweets.length)
-        }
-      })
+      if (type === 'main') {
+        this.setState(prevState => {
+          return {
+            leftTweets: prevState.leftTweets.concat(data.newLeftTweets),
+            rightTweets: prevState.rightTweets.concat(data.newRightTweets),
+            leftCount: (prevState.leftCount += data.newLeftTweets.length),
+            rightCount: (prevState.rightCount += data.newRightTweets.length)
+          }
+        })
+      }
     }
   }
 
@@ -107,9 +115,48 @@ class App extends Component {
     this.setState({ [event.target.name]: event.target.value })
   }
 
+  onIconClick(icon, id) {
+    this.setState(prevState => {
+      let left = true
+      let index = prevState.leftTweets.findIndex(tweet => tweet.id === id)
+
+      if (index < 0) {
+        left = false
+        index = prevState.rightTweets.findIndex(tweet => tweet.id === id)
+      }
+
+      let tweets = left ? prevState.leftTweets : prevState.rightTweets
+
+      tweets[index][icon] = !tweets[index][icon]
+
+      let returnVal = left ? 'leftTweets' : 'rightTweets'
+      let returnObj = { [returnVal]: tweets }
+
+      let subTweets = prevState.tweetLists[icon]
+      if (tweets[index][icon]) {
+        subTweets.push(tweets[index])
+      } else {
+        subTweets.splice(subTweets.findIndex(tweet => tweet.id === id), 1)
+      }
+      let tweetsList = Object.assign({}, prevState.tweetLists)
+      tweetsList[icon] = subTweets
+      returnObj.tweetsList = tweetsList
+
+      request
+        .post(`//${process.env.REACT_APP_BACKEND_API}/set-${icon}-data`)
+        .set({ 'Content-Type': 'application/json' })
+        .send({ tweets: subTweets })
+        .end((err, res) => {
+          return
+        })
+
+      return returnObj
+    })
+  }
+
   sortAndFilter() {
-    let leftTweets = this.state.leftTweets.reverse()
-    let rightTweets = this.state.rightTweets.reverse()
+    let leftTweets = this.state.leftTweets.slice().reverse()
+    let rightTweets = this.state.rightTweets.slice().reverse()
     return { leftTweets, rightTweets }
   }
 
@@ -132,7 +179,7 @@ class App extends Component {
       )
     }
     return (
-      <div className="App">
+      <div className="MainController">
         {header}
         <div className="container">
           <div className="row">
@@ -209,13 +256,27 @@ class App extends Component {
           <div className="row">
             <div className="col-sm-5">
               {leftTweets.map(tweet => {
-                return <Tweet key={tweet.id} data={tweet} />
+                return (
+                  <Tweet
+                    key={tweet.id}
+                    data={tweet}
+                    onIconClick={this.onIconClick}
+                    control
+                  />
+                )
               })}
             </div>
             <div className="col-sm-2" />
             <div className="col-sm-5">
               {rightTweets.map(tweet => {
-                return <Tweet key={tweet.id} data={tweet} />
+                return (
+                  <Tweet
+                    key={tweet.id}
+                    data={tweet}
+                    onIconClick={this.onIconClick}
+                    control
+                  />
+                )
               })}
             </div>
           </div>
@@ -225,4 +286,4 @@ class App extends Component {
   }
 }
 
-export default App
+export default MainController

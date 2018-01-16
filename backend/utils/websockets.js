@@ -14,6 +14,6 @@ exports.createWebSocketServer = function(server) {
   }
 }
 
-exports.broadcastChange = function(newLeftTweets, newRightTweets) {
-  wss.broadcast(JSON.stringify({ newLeftTweets, newRightTweets }))
+exports.broadcastChange = (type, data) => {
+  wss.broadcast(JSON.stringify({ type, data }))
 }

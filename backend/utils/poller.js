@@ -100,8 +100,11 @@ const poll = () => {
     })
     .then(tweets => {
       right = processTweets(tweets, false)
-      wss.broadcastChange(left, right)
-      return Poll.modify(left, right)
+      wss.broadcastChange('main', {
+        newLeftTweets: left,
+        newRightTweets: right
+      })
+      return Poll.addTweets(left, right)
     })
     .then(() => {
       setTimeout(() => {

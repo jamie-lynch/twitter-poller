@@ -1,5 +1,6 @@
 var poller = require('../utils/poller')
 var Poll = require('../models/poll')
+var wss = require('../utils/websockets')
 
 exports.index = function(req, res, next) {
   res.render('index')
@@ -26,4 +27,25 @@ exports.stopPoll = function(req, res, next) {
   poller.stopPoll().then(() => {
     return res.status(200).json({ success: true })
   })
+}
+
+exports.getPresenterData = function(req, res, next) {
+  Poll.getPresenterData().then(data => {
+    return res.status(200).json(Object.assign(data, { success: true }))
+  })
+}
+
+exports.setPresenterData = function(req, res, next) {
+  Poll.setPresenterTweets(req.body.tweets).then(() => {
+    wss.broadcastChange('presenter', req.body.tweets)
+    return res.status(200).json({ success: true })
+  })
+}
+
+exports.getDisplayData = function(req, res, next) {
+  return res.status(200).json({ success: true })
+}
+
+exports.setDisplayData = function(req, res, next) {
+  return res.status(200).json({ success: true })
 }

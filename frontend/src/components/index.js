@@ -1,4 +1,6 @@
-export { default as App } from './App'
+// pages
+export { default as PageMainController } from './pages/MainController'
+export { default as PagePresenterView } from './pages/PresenterView'
 
 // elements
 export { default as Tweet } from './elements/Tweet'

@@ -6009,13 +6009,21 @@ body {
   background-color: #f8f9fa; }
 
 .tweet {
+  margin-bottom: 10px; }
+
+.tweet-body {
   border: 1px solid #e1e8ed;
   border-radius: 5px;
   display: inline-block;
   background-color: #fff;
   width: 100%;
-  margin-bottom: 10px;
-  padding: 1em; }
+  padding: 1em;
+  margin-bottom: 0px; }
+
+.tweet-body.control {
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  border-bottom: none; }
 
 .tweet-header {
   display: flex;
@@ -6047,6 +6055,29 @@ body {
   flex-direction: row;
   justify-content: flex-end;
   align-items: flex-end; }
+
+.tweet-control-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  height: 40px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  background-color: #f5f8fa;
+  border: 1px solid #e1e8ed;
+  color: #657786;
+  border-top: none;
+  margin-top: 0px;
+  padding: 0 15px; }
+
+.tweet-control-bar-icon {
+  margin: 0 10px;
+  cursor: pointer; }
+
+.tweet-control-bar-icon.active {
+  color: #1da1f2; }
 
 .counter {
   width: 100%;
