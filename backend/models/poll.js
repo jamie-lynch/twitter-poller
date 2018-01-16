@@ -102,6 +102,18 @@ pollSchema.statics.stop = () => {
   })
 }
 
+pollSchema.statics.removeAll = () => {
+  return new Promise((resolve, reject) => {
+    Poll.remove({})
+      .then(() => {
+        resolve()
+      })
+      .catch(err => {
+        reject(err)
+      })
+  })
+}
+
 var Poll = mongoose.model('Poll', pollSchema)
 
 module.exports = Poll

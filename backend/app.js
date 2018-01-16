@@ -26,7 +26,9 @@ var db = mongoose.connection
 db.on('error', console.error.bind(console, 'MongoDB connection error:'))
 
 // Create a poll
-Poll.create()
+Poll.removeAll().then(() => {
+  Poll.create()
+})
 
 // create an express app
 var app = express()

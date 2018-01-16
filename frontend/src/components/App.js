@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import request from 'superagent'
 
 // components
-import { Tweet, Counter } from '../components'
+import { Tweet, Counter, Loader } from '../components'
 
 class App extends Component {
   constructor(props) {
@@ -14,6 +14,7 @@ class App extends Component {
     this.startPoll = this.startPoll.bind(this)
     this.endPoll = this.endPoll.bind(this)
     this.listen = this.listen.bind(this)
+    this.setInitialState = this.setInitialState.bind(this)
 
     this.state = {
       // Available values: 'Start' | 'Stop'
@@ -24,13 +25,26 @@ class App extends Component {
       rightCount: 0,
       leftHashtag: '',
       rightHashtag: '',
-      started_at: null
+      active: false,
+      loading: true
     }
   }
 
   componentDidMount() {
-    this.ws = new window.WebSocket(`ws://${process.env.REACT_APP_BACKEND_API}`)
-    this.listen(this.ws)
+    this.setInitialState()
+  }
+
+  setInitialState() {
+    request
+      .get(`//${process.env.REACT_APP_BACKEND_API}/get-poll-data`)
+      .set({ 'Content-Type': 'application/json' })
+      .end((err, res) => {
+        this.setState({ ...res.body, loading: false })
+        this.ws = new window.WebSocket(
+          `ws://${process.env.REACT_APP_BACKEND_API}`
+        )
+        this.listen(this.ws)
+      })
   }
 
   listen(ws) {
@@ -75,7 +89,7 @@ class App extends Component {
         this.startPoll()
         return {
           buttonState: 'Stop',
-          started_at: Date.now(),
+          active: true,
           leftTweets: [],
           rightTweets: [],
           leftCount: 0,
@@ -83,7 +97,7 @@ class App extends Component {
         }
       } else {
         this.endPoll()
-        return { buttonState: 'Start' }
+        return { buttonState: 'Start', active: false }
       }
     })
   }
@@ -93,13 +107,24 @@ class App extends Component {
   }
 
   render() {
+    let header = (
+      <div className="header d-flex flex-column align-items-center mb-4">
+        <h1>Twitter Poller</h1>
+        <p>Survey opinions by counting tweets</p>
+      </div>
+    )
+
+    if (this.state.loading) {
+      return (
+        <div className="app">
+          {header}
+          <Loader />
+        </div>
+      )
+    }
     return (
       <div className="App">
-        <div className="header d-flex flex-column align-items-center mb-4">
-          <h1>Twitter Poller</h1>
-          <p>Survey opinions by counting tweets</p>
-        </div>
-
+        {header}
         <div className="container">
           <div className="row">
             <div className="col-sm-5">
@@ -118,6 +143,7 @@ class App extends Component {
                   aria-label="leftHashtag"
                   aria-describedby="basic-addon1"
                   onChange={this.handleChange}
+                  value={this.state.leftHashtag}
                   disabled={this.state.buttonState === 'Stop'}
                 />
               </div>
@@ -153,6 +179,7 @@ class App extends Component {
                   placeholder="hashtag"
                   aria-label="rightHashtag"
                   aria-describedby="basic-addon1"
+                  value={this.state.rightHashtag}
                   onChange={this.handleChange}
                   disabled={this.state.buttonState === 'Stop'}
                 />
@@ -160,17 +187,15 @@ class App extends Component {
             </div>
           </div>
 
-          {this.state.started_at && (
-            <div className="row">
-              <div className="col-sm-5">
-                <Counter count={this.state.leftCount} />
-              </div>
-              <div className="col-sm-2" />
-              <div className="col-sm-5">
-                <Counter count={this.state.rightCount} />
-              </div>
+          <div className="row">
+            <div className="col-sm-5">
+              <Counter count={this.state.leftCount} />
             </div>
-          )}
+            <div className="col-sm-2" />
+            <div className="col-sm-5">
+              <Counter count={this.state.rightCount} />
+            </div>
+          </div>
 
           <div className="row">
             <div className="col-sm-5">
