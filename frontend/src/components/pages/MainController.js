@@ -3,7 +3,13 @@ import React, { Component } from 'react'
 import request from 'superagent'
 
 // components
-import { Tweet, Counter, Loader } from '../../components'
+import {
+  Tweet,
+  Counter,
+  Loader,
+  MainControls,
+  ShortlistModal
+} from '../../components'
 
 class MainController extends Component {
   constructor(props) {
@@ -16,6 +22,8 @@ class MainController extends Component {
     this.handleClick = this.handleClick.bind(this)
     this.handleChange = this.handleChange.bind(this)
     this.onIconClick = this.onIconClick.bind(this)
+    this.clearTweetList = this.clearTweetList.bind(this)
+    this.toggleModal = this.toggleModal.bind(this)
     this.sortAndFilter = this.sortAndFilter.bind(this)
 
     this.state = {
@@ -32,7 +40,8 @@ class MainController extends Component {
       tweetLists: {
         presenter: [],
         display: []
-      }
+      },
+      shortlistModal: null
     }
   }
 
@@ -224,6 +233,43 @@ class MainController extends Component {
     })
   }
 
+  clearTweetList(list) {
+    this.setState(prevState => {
+      let leftTweets = prevState.leftTweets.slice()
+      let rightTweets = prevState.rightTweets.slice()
+
+      leftTweets.forEach(tweet => {
+        tweet[list] = false
+      })
+
+      rightTweets.forEach(tweet => {
+        tweet[list] = false
+      })
+
+      let tweetLists = Object.assign({}, prevState.tweetLists)
+      tweetLists[list] = []
+
+      request
+        .post(`//${process.env.REACT_APP_BACKEND_API}/set-${list}-data`)
+        .set({ 'Content-Type': 'application/json' })
+        .send({ tweets: [] })
+        .end((err, res) => {
+          return
+        })
+
+      return { leftTweets, rightTweets, tweetLists, shortlistModal: null }
+    })
+  }
+
+  toggleModal(shortlist) {
+    this.setState(prevState => {
+      return {
+        shortlistModal:
+          prevState.shortlistModal === shortlist ? null : shortlist
+      }
+    })
+  }
+
   sortAndFilter() {
     let leftTweets = this.state.leftTweets.slice().reverse()
     let rightTweets = this.state.rightTweets.slice().reverse()
@@ -275,7 +321,7 @@ class MainController extends Component {
               </div>
             </div>
 
-            <div className="col-sm-2 d-flex flex-row justify-content-center">
+            <div className="col-sm-2 d-flex flex-row justify-content-center mb-3">
               <div>
                 <button
                   className="btn btn-primary m-auto"
@@ -351,6 +397,23 @@ class MainController extends Component {
             </div>
           </div>
         </div>
+        <MainControls onControlClick={this.toggleModal} />
+        <ShortlistModal
+          open={this.state.shortlistModal === 'presenter'}
+          toggle={() => this.toggleModal('presenter')}
+          shortlist="presenter"
+          tweets={this.state.tweetLists.presenter}
+          onIconClick={this.onIconClick}
+          clear={this.clearTweetList}
+        />
+        <ShortlistModal
+          open={this.state.shortlistModal === 'display'}
+          toggle={() => this.toggleModal('display')}
+          shortlist="display"
+          tweets={this.state.tweetLists.display}
+          onIconClick={this.onIconClick}
+          clear={this.clearTweetList}
+        />
       </div>
     )
   }

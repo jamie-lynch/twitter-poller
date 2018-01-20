@@ -1,0 +1,12 @@
+.navbar {
+  background-color: $gray-200;
+}
+
+.navbar-controls svg {
+  margin: 0 0.75em;
+  cursor: pointer;
+  color: $gray-800;
+  &.active {
+    color: map-get($twitter, 'blue');
+  }
+}
