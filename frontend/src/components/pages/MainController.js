@@ -45,7 +45,44 @@ class MainController extends Component {
       .get(`//${process.env.REACT_APP_BACKEND_API}/get-poll-data`)
       .set({ 'Content-Type': 'application/json' })
       .end((err, res) => {
-        this.setState({ ...res.body, loading: false })
+        let pres = res.body.presenterTweets.slice()
+
+        let leftTweets = res.body.leftTweets.slice()
+        leftTweets.forEach((tweet, index) => {
+          if (
+            pres.find(presTweet => {
+              return presTweet.id === tweet.id
+            })
+          ) {
+            leftTweets[index].presenter = true
+          }
+        })
+
+        let rightTweets = res.body.rightTweets.slice()
+        rightTweets.forEach((tweet, index) => {
+          if (
+            pres.find(presTweet => {
+              return presTweet.id === tweet.id
+            })
+          ) {
+            rightTweets[index].presenter = true
+          }
+        })
+
+        this.setState({
+          leftHashtag: res.body.leftHashtag,
+          rightHashtag: res.body.rightHashtag,
+          leftTweets: leftTweets,
+          rightTweets: rightTweets,
+          leftCount: res.body.leftCount,
+          rightCount: res.body.rightCount,
+          tweetLists: {
+            presenter: pres,
+            display: []
+          },
+          active: res.body.active,
+          loading: false
+        })
         this.ws = new window.WebSocket(
           `ws://${process.env.REACT_APP_BACKEND_API}`
         )

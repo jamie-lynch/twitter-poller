@@ -18,6 +18,7 @@ class PresenterView extends Component {
       rightCount: 0,
       leftHashtag: '',
       rightHashtag: '',
+      active: false,
       loading: true
     }
   }
@@ -31,7 +32,15 @@ class PresenterView extends Component {
       .get(`//${process.env.REACT_APP_BACKEND_API}/get-presenter-data`)
       .set({ 'Content-Type': 'application/json' })
       .end((err, res) => {
-        this.setState({ ...res.body, loading: false })
+        this.setState({
+          leftCount: res.body.leftCount,
+          rightCount: res.body.rightCount,
+          leftHashtag: res.body.leftHashtag,
+          rightHashtag: res.body.rightHashtag,
+          tweets: res.body.presenterTweets,
+          active: res.body.active,
+          loading: false
+        })
         this.ws = new window.WebSocket(
           `ws://${process.env.REACT_APP_BACKEND_API}`
         )
@@ -43,8 +52,6 @@ class PresenterView extends Component {
     ws.onmessage = received => {
       var msg = JSON.parse(received.data)
       var { type, data } = msg
-
-      console.log(msg)
 
       if (type === 'presenter') {
         this.setState({ tweets: data })
@@ -62,8 +69,9 @@ class PresenterView extends Component {
   render() {
     let header = (
       <div className="header d-flex flex-column align-items-center mb-4">
-        <h1>Twitter Poller - Presenter View</h1>
+        <h1>Twitter Poller</h1>
         <p>Survey opinions by counting tweets</p>
+        <h4>Presenter View</h4>
       </div>
     )
 
@@ -79,22 +87,27 @@ class PresenterView extends Component {
       <div className="PresenterView">
         {header}
 
-        <div className="row">
-          <div className="col-sm-5">
-            <div>{this.state.leftHashtag}</div>
+        <div className="row justify-content-center">
+          <div className="col-sm-4 col-md-3">
+            <div className="d-flex flex-row justify-content-center">
+              <h4>#{this.state.leftHashtag}</h4>
+            </div>
             <Counter count={this.state.leftCount} />
           </div>
-          <div className="col-sm-2" />
-          <div className="col-sm-5">
-            <div>{this.state.rightHashtag}</div>
+          <div className="col-sm-4 col-md-3">
+            <div className="d-flex flex-row justify-content-center">
+              <h4>#{this.state.rightHashtag}</h4>
+            </div>
             <Counter count={this.state.rightCount} />
           </div>
         </div>
 
-        <div className="row">
-          {this.state.tweets.map(tweet => {
-            return <Tweet key={tweet.id} data={tweet} />
-          })}
+        <div className="row justify-content-center">
+          <div className="col-lg-5 col-md-6, col-sm-10 m-3">
+            {this.state.tweets.map(tweet => {
+              return <Tweet key={tweet.id} data={tweet} />
+            })}
+          </div>
         </div>
       </div>
     )
