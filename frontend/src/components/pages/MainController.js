@@ -104,6 +104,39 @@ class MainController extends Component {
             rightCount: (prevState.rightCount += data.newRightTweets.length)
           }
         })
+      } else if (type === 'presenter') {
+        this.setState(prevState => {
+          let leftTweets = prevState.leftTweets.slice()
+          leftTweets.forEach((tweet, index) => {
+            if (
+              data.find(presTweet => {
+                return presTweet.id === tweet.id
+              })
+            ) {
+              leftTweets[index].presenter = true
+            } else {
+              leftTweets[index].presenter = false
+            }
+          })
+
+          let rightTweets = prevState.rightTweets.slice()
+          rightTweets.forEach((tweet, index) => {
+            if (
+              data.find(presTweet => {
+                return presTweet.id === tweet.id
+              })
+            ) {
+              rightTweets[index].presenter = true
+            } else {
+              rightTweets[index].presenter = false
+            }
+          })
+          return {
+            presenterTweets: data,
+            leftTweets,
+            rightTweets
+          }
+        })
       }
     }
   }
