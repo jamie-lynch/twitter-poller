@@ -11,6 +11,7 @@ class PresenterView extends Component {
 
     this.setInitialState = this.setInitialState.bind(this)
     this.listen = this.listen.bind(this)
+    this.onIconClick = this.onIconClick.bind(this)
 
     this.state = {
       tweets: [],
@@ -66,6 +67,26 @@ class PresenterView extends Component {
     }
   }
 
+  onIconClick(icon, id) {
+    if (icon === 'remove') {
+      this.setState(prevState => {
+        let tweets = prevState.tweets.slice()
+        let index = tweets.findIndex(tweet => tweet.id === id)
+        tweets.splice(index, 1)
+
+        request
+          .post(`//${process.env.REACT_APP_BACKEND_API}/set-presenter-data`)
+          .set({ 'Content-Type': 'application/json' })
+          .send({ tweets })
+          .end((err, res) => {
+            return
+          })
+
+        return { tweets }
+      })
+    }
+  }
+
   render() {
     let header = (
       <div className="header d-flex flex-column align-items-center mb-4">
@@ -105,7 +126,14 @@ class PresenterView extends Component {
         <div className="row justify-content-center">
           <div className="col-lg-5 col-md-6, col-sm-10 m-3">
             {this.state.tweets.map(tweet => {
-              return <Tweet key={tweet.id} data={tweet} />
+              return (
+                <Tweet
+                  key={tweet.id}
+                  data={tweet}
+                  control="presenter"
+                  onIconClick={this.onIconClick}
+                />
+              )
             })}
           </div>
         </div>

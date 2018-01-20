@@ -331,7 +331,7 @@ class MainController extends Component {
                     key={tweet.id}
                     data={tweet}
                     onIconClick={this.onIconClick}
-                    control
+                    control="main"
                   />
                 )
               })}
@@ -344,7 +344,7 @@ class MainController extends Component {
                     key={tweet.id}
                     data={tweet}
                     onIconClick={this.onIconClick}
-                    control
+                    control="main"
                   />
                 )
               })}
