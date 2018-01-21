@@ -16,6 +16,12 @@ exports.startPoll = function(req, res, next) {
   poller
     .startPoll(req.body.leftHashtag, req.body.rightHashtag)
     .then(() => {
+      let wsMessage = {
+        leftHashtag: req.body.leftHashtag,
+        rightHashtag: req.body.rightHashtag,
+        active: true
+      }
+      wss.broadcastChange('start-stop', wsMessage)
       return res.status(200).json({ success: true })
     })
     .catch(err => {
@@ -25,6 +31,7 @@ exports.startPoll = function(req, res, next) {
 
 exports.stopPoll = function(req, res, next) {
   poller.stopPoll().then(() => {
+    wss.broadcastChange('start-stop', { active: false })
     return res.status(200).json({ success: true })
   })
 }

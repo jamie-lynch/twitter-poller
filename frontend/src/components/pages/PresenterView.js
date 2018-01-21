@@ -125,16 +125,22 @@ class PresenterView extends Component {
 
         <div className="row justify-content-center">
           <div className="col-lg-5 col-md-6, col-sm-10 m-3">
-            {this.state.tweets.map(tweet => {
-              return (
-                <Tweet
-                  key={tweet.id}
-                  data={tweet}
-                  control="presenter"
-                  onIconClick={this.onIconClick}
-                />
-              )
-            })}
+            {this.state.tweets.length ? (
+              this.state.tweets.map(tweet => {
+                return (
+                  <Tweet
+                    key={tweet.id}
+                    data={tweet}
+                    control="presenter"
+                    onIconClick={this.onIconClick}
+                  />
+                )
+              })
+            ) : (
+              <span className="d-flex flex-row justify-content-center mt-4">
+                There are currently no tweets in the presenter shortlist
+              </span>
+            )}
           </div>
         </div>
       </div>

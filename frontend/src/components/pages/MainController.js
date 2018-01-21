@@ -116,81 +116,105 @@ class MainController extends Component {
       var msg = JSON.parse(received.data)
       var { type, data } = msg
 
-      if (type === 'main') {
-        this.setState(prevState => {
-          return {
-            leftTweets: prevState.leftTweets.concat(data.newLeftTweets),
-            rightTweets: prevState.rightTweets.concat(data.newRightTweets),
-            leftCount: (prevState.leftCount += data.newLeftTweets.length),
-            rightCount: (prevState.rightCount += data.newRightTweets.length)
-          }
-        })
-      } else if (type === 'presenter') {
-        this.setState(prevState => {
-          let leftTweets = prevState.leftTweets.slice()
-          leftTweets.forEach((tweet, index) => {
-            if (
-              data.find(presTweet => {
-                return presTweet.id === tweet.id
-              })
-            ) {
-              leftTweets[index].presenter = true
-            } else {
-              leftTweets[index].presenter = false
+      switch (type) {
+        case 'main':
+          this.setState(prevState => {
+            return {
+              leftTweets: prevState.leftTweets.concat(data.newLeftTweets),
+              rightTweets: prevState.rightTweets.concat(data.newRightTweets),
+              leftCount: (prevState.leftCount += data.newLeftTweets.length),
+              rightCount: (prevState.rightCount += data.newRightTweets.length)
             }
           })
+          break
+        case 'presenter':
+          this.setState(prevState => {
+            let leftTweets = prevState.leftTweets.slice()
+            leftTweets.forEach((tweet, index) => {
+              if (
+                data.find(presTweet => {
+                  return presTweet.id === tweet.id
+                })
+              ) {
+                leftTweets[index].presenter = true
+              } else {
+                leftTweets[index].presenter = false
+              }
+            })
 
-          let rightTweets = prevState.rightTweets.slice()
-          rightTweets.forEach((tweet, index) => {
-            if (
-              data.find(presTweet => {
-                return presTweet.id === tweet.id
-              })
-            ) {
-              rightTweets[index].presenter = true
-            } else {
-              rightTweets[index].presenter = false
+            let rightTweets = prevState.rightTweets.slice()
+            rightTweets.forEach((tweet, index) => {
+              if (
+                data.find(presTweet => {
+                  return presTweet.id === tweet.id
+                })
+              ) {
+                rightTweets[index].presenter = true
+              } else {
+                rightTweets[index].presenter = false
+              }
+            })
+            return {
+              presenterTweets: data,
+              leftTweets,
+              rightTweets
             }
           })
-          return {
-            presenterTweets: data,
-            leftTweets,
-            rightTweets
-          }
-        })
-      } else if (type === 'display') {
-        this.setState(prevState => {
-          let leftTweets = prevState.leftTweets.slice()
-          leftTweets.forEach((tweet, index) => {
-            if (
-              data.find(displayTweet => {
-                return displayTweet.id === tweet.id
-              })
-            ) {
-              leftTweets[index].display = true
-            } else {
-              leftTweets[index].display = false
-            }
-          })
+          break
+        case 'display':
+          this.setState(prevState => {
+            let leftTweets = prevState.leftTweets.slice()
+            leftTweets.forEach((tweet, index) => {
+              if (
+                data.find(displayTweet => {
+                  return displayTweet.id === tweet.id
+                })
+              ) {
+                leftTweets[index].display = true
+              } else {
+                leftTweets[index].display = false
+              }
+            })
 
-          let rightTweets = prevState.rightTweets.slice()
-          rightTweets.forEach((tweet, index) => {
-            if (
-              data.find(displayTweet => {
-                return displayTweet.id === tweet.id
-              })
-            ) {
-              rightTweets[index].display = true
-            } else {
-              rightTweets[index].display = false
+            let rightTweets = prevState.rightTweets.slice()
+            rightTweets.forEach((tweet, index) => {
+              if (
+                data.find(displayTweet => {
+                  return displayTweet.id === tweet.id
+                })
+              ) {
+                rightTweets[index].display = true
+              } else {
+                rightTweets[index].display = false
+              }
+            })
+            return {
+              displayTweets: data,
+              leftTweets,
+              rightTweets
             }
           })
-          return {
-            displayTweets: data,
-            leftTweets,
-            rightTweets
+          break
+        case 'start-stop':
+          if (data.active) {
+            this.setState({
+              leftTweets: [],
+              rightTweets: [],
+              leftHashtag: data.leftHashtag,
+              rightHashtag: data.rightHashtag,
+              leftCount: 0,
+              rightCount: 0,
+              active: true,
+              buttonState: 'Stop',
+              presenterTweets: [],
+              displayTweets: []
+            })
+          } else {
+            this.setState({ active: false, buttonState: 'Start' })
           }
-        })
+          break
+        default:
+          break
       }
     }
   }
