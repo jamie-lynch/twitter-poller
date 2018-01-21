@@ -1,6 +1,7 @@
 // pages
 export { default as PageMainController } from './pages/MainController'
 export { default as PagePresenterView } from './pages/PresenterView'
+export { default as PageDisplayView } from './pages/DisplayView'
 
 // elements
 export { default as Tweet } from './elements/Tweet'

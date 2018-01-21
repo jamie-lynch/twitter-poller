@@ -6004,7 +6004,7 @@ a.text-dark:focus, a.text-dark:hover {
 
 body {
   margin: 0;
-  margin-top: 0.75em;
+  padding-top: 0.75em;
   padding: 0;
   font-family: sans-serif;
   background-color: #f8f9fa; }
@@ -6121,3 +6121,127 @@ body {
   color: #343a40; }
   .navbar-controls svg.active {
     color: #1da1f2; }
+
+.display {
+  background-image: url("/images/background.png");
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+  padding-top: 2em; }
+
+.display-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%; }
+
+.display-title-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  margin-top: 30px; }
+
+.display-title-first {
+  display: inline-flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-content: center;
+  background-color: #e5007d;
+  height: 3.5em;
+  width: 33%;
+  box-shadow: 5px 3px 5px #575756; }
+
+.display-title-join-1 {
+  width: 0;
+  height: 0;
+  border-top: 3.5em solid #e5007d;
+  border-right: 2em solid #ffffff;
+  box-shadow: 5px 3px 5px #575756; }
+
+.display-title-join-2 {
+  width: 0;
+  height: 0;
+  border-bottom: 3.5em solid #ffffff;
+  border-left: 2em solid #ffffff;
+  box-shadow: 5px 3px 5px #575756; }
+
+.display-title-second {
+  display: inline-flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  height: 3.5em;
+  width: 42%;
+  box-shadow: 5px 3px 5px #575756; }
+
+.display-title-end-1 {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-top: 3.5em solid #ffffff;
+  border-right: 2em solid transparent; }
+
+.display-title-end-2 {
+  display: inline-block;
+  width: 50px;
+  height: 3.5em;
+  transform: skew(-30deg) translateX(-20px);
+  background: #fff;
+  box-shadow: 5px 3px 5px #575756; }
+
+.display-title-text-1 {
+  font-size: 2em;
+  font-family: 'Roboto', cursive;
+  color: #fff; }
+
+.display-title-text-2 {
+  font-size: 2em;
+  font-family: 'Roboto', cursive; }
+
+.display-logo {
+  width: 250px;
+  z-index: 999;
+  position: absolute;
+  left: 6%; }
+
+.twitter-blue {
+  color: #1da1f2; }
+
+.display-content {
+  width: 100%;
+  margin-top: 5em;
+  margin-bottom: 5em;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center; }
+
+.display-chart-container {
+  position: absolute;
+  width: 60%;
+  height: 70%;
+  transform: skew(-30deg);
+  left: -15%;
+  opacity: 0.8;
+  background-color: #4a1863;
+  box-shadow: 5px 3px 30px 3px #343a40; }
+
+.display-tweet-container {
+  position: absolute;
+  width: 60%;
+  height: 70%;
+  right: -15%;
+  transform: skew(-30deg);
+  opacity: 0.8;
+  background-color: #4a1863;
+  box-shadow: 5px 3px 30px 3px #343a40; }
