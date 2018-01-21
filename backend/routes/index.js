@@ -21,4 +21,10 @@ router.get('/get-presenter-data', controller.getPresenterData)
 /* POST presenter data */
 router.post('/set-presenter-data', controller.setPresenterData)
 
+/* GET display data */
+router.get('/get-display-data', controller.getDisplayData)
+
+/* POST display data */
+router.post('/set-display-data', controller.setDisplayData)
+
 module.exports = router

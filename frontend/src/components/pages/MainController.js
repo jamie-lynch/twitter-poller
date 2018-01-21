@@ -37,10 +37,8 @@ class MainController extends Component {
       rightHashtag: '',
       active: false,
       loading: true,
-      tweetLists: {
-        presenter: [],
-        display: []
-      },
+      presenterTweets: [],
+      displayTweets: [],
       shortlistModal: null
     }
   }
@@ -55,6 +53,7 @@ class MainController extends Component {
       .set({ 'Content-Type': 'application/json' })
       .end((err, res) => {
         let pres = res.body.presenterTweets.slice()
+        let display = res.body.displayTweets.slice()
 
         let leftTweets = res.body.leftTweets.slice()
         leftTweets.forEach((tweet, index) => {
@@ -64,6 +63,13 @@ class MainController extends Component {
             })
           ) {
             leftTweets[index].presenter = true
+          }
+          if (
+            display.find(displayTweet => {
+              return displayTweet.id === tweet.id
+            })
+          ) {
+            leftTweets[index].display = true
           }
         })
 
@@ -76,19 +82,25 @@ class MainController extends Component {
           ) {
             rightTweets[index].presenter = true
           }
+          if (
+            display.find(displayTweet => {
+              return displayTweet.id === tweet.id
+            })
+          ) {
+            rightTweets[index].display = true
+          }
         })
 
         this.setState({
+          buttonState: res.body.active ? 'Stop' : 'Start',
           leftHashtag: res.body.leftHashtag,
           rightHashtag: res.body.rightHashtag,
           leftTweets: leftTweets,
           rightTweets: rightTweets,
           leftCount: res.body.leftCount,
           rightCount: res.body.rightCount,
-          tweetLists: {
-            presenter: pres,
-            display: []
-          },
+          presenterTweets: pres,
+          displayTweets: display,
           active: res.body.active,
           loading: false
         })
@@ -146,6 +158,39 @@ class MainController extends Component {
             rightTweets
           }
         })
+      } else if (type === 'display') {
+        this.setState(prevState => {
+          let leftTweets = prevState.leftTweets.slice()
+          leftTweets.forEach((tweet, index) => {
+            if (
+              data.find(displayTweet => {
+                return displayTweet.id === tweet.id
+              })
+            ) {
+              leftTweets[index].display = true
+            } else {
+              leftTweets[index].display = false
+            }
+          })
+
+          let rightTweets = prevState.rightTweets.slice()
+          rightTweets.forEach((tweet, index) => {
+            if (
+              data.find(displayTweet => {
+                return displayTweet.id === tweet.id
+              })
+            ) {
+              rightTweets[index].display = true
+            } else {
+              rightTweets[index].display = false
+            }
+          })
+          return {
+            displayTweets: data,
+            leftTweets,
+            rightTweets
+          }
+        })
       }
     }
   }
@@ -181,7 +226,9 @@ class MainController extends Component {
           leftTweets: [],
           rightTweets: [],
           leftCount: 0,
-          rightCount: 0
+          rightCount: 0,
+          presenterTweets: [],
+          displayTweets: []
         }
       } else {
         this.endPoll()
@@ -211,15 +258,13 @@ class MainController extends Component {
       let returnVal = left ? 'leftTweets' : 'rightTweets'
       let returnObj = { [returnVal]: tweets }
 
-      let subTweets = prevState.tweetLists[icon]
+      let subTweets = prevState[`${icon}Tweets`]
       if (tweets[index][icon]) {
         subTweets.push(tweets[index])
       } else {
         subTweets.splice(subTweets.findIndex(tweet => tweet.id === id), 1)
       }
-      let tweetsList = Object.assign({}, prevState.tweetLists)
-      tweetsList[icon] = subTweets
-      returnObj.tweetsList = tweetsList
+      returnObj[`${icon}Tweets`] = subTweets
 
       request
         .post(`//${process.env.REACT_APP_BACKEND_API}/set-${icon}-data`)
@@ -402,7 +447,7 @@ class MainController extends Component {
           open={this.state.shortlistModal === 'presenter'}
           toggle={() => this.toggleModal('presenter')}
           shortlist="presenter"
-          tweets={this.state.tweetLists.presenter}
+          tweets={this.state.presenterTweets}
           onIconClick={this.onIconClick}
           clear={this.clearTweetList}
         />
@@ -410,7 +455,7 @@ class MainController extends Component {
           open={this.state.shortlistModal === 'display'}
           toggle={() => this.toggleModal('display')}
           shortlist="display"
-          tweets={this.state.tweetLists.display}
+          tweets={this.state.displayTweets}
           onIconClick={this.onIconClick}
           clear={this.clearTweetList}
         />

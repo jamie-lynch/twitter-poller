@@ -43,9 +43,14 @@ exports.setPresenterData = function(req, res, next) {
 }
 
 exports.getDisplayData = function(req, res, next) {
-  return res.status(200).json({ success: true })
+  Poll.getDisplayData().then(data => {
+    return res.status(200).json(Object.assign(data, { success: true }))
+  })
 }
 
 exports.setDisplayData = function(req, res, next) {
-  return res.status(200).json({ success: true })
+  Poll.setDisplayTweets(req.body.tweets).then(() => {
+    wss.broadcastChange('display', req.body.tweets)
+    return res.status(200).json({ success: true })
+  })
 }

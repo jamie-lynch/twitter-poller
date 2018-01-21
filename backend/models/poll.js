@@ -18,6 +18,10 @@ var pollSchema = new Schema({
     type: [],
     default: []
   },
+  displayTweets: {
+    type: [],
+    default: []
+  },
   active: { type: Boolean, default: false }
 })
 
@@ -50,9 +54,21 @@ pollSchema.statics.get = (tweets = false) => {
 
 pollSchema.statics.getPresenterData = () => {
   return new Promise((resolve, reject) => {
-    Poll.find({}, { leftTweets: 0, rightTweets: 0 }).then(polls => {
-      return resolve(polls[0])
-    })
+    Poll.find({}, { leftTweets: 0, rightTweets: 0, displayTweets: 0 }).then(
+      polls => {
+        return resolve(polls[0])
+      }
+    )
+  })
+}
+
+pollSchema.statics.getDisplayData = () => {
+  return new Promise((resolve, reject) => {
+    Poll.find({}, { leftTweets: 0, rightTweets: 0, presenterTweets: 0 }).then(
+      polls => {
+        return resolve(polls[0])
+      }
+    )
   })
 }
 
@@ -88,6 +104,24 @@ pollSchema.statics.setPresenterTweets = tweets => {
         let id = polls[0].id
         return Poll.update({
           presenterTweets: tweets
+        })
+      })
+      .then(() => {
+        return resolve()
+      })
+      .catch(() => {
+        return reject()
+      })
+  })
+}
+
+pollSchema.statics.setDisplayTweets = tweets => {
+  return new Promise((resolve, reject) => {
+    Poll.find({}, { id: 1 })
+      .then(polls => {
+        let id = polls[0].id
+        return Poll.update({
+          displayTweets: tweets
         })
       })
       .then(() => {
