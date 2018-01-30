@@ -11,6 +11,12 @@
   padding-top: 2em;
 }
 
+.twitter-blue {
+  color: map-get($twitter, 'blue');
+}
+
+// HEADER
+
 .display-header {
   display: flex;
   flex-direction: row;
@@ -101,9 +107,7 @@
   left: 6%;
 }
 
-.twitter-blue {
-  color: map-get($twitter, 'blue');
-}
+// CONTENT
 
 .display-content {
   width: 100%;
@@ -118,22 +122,42 @@
 
 .display-chart-container {
   position: absolute;
-  width: 60%;
-  height: 70%;
+  width: 1150px;
+  height: 750px;
+  left: -275px;
   transform: skew(-30deg);
-  left: -15%;
-  opacity: 0.8;
-  background-color: map-get($lsu, 'purple');
+  background-color: rgba(74, 24, 99, 0.8);
   box-shadow: 5px 3px 30px 3px $gray-800;
 }
 
 .display-tweet-container {
   position: absolute;
-  width: 60%;
-  height: 70%;
-  right: -15%;
+  width: 1150px;
+  height: 750px;
+  right: -275px;
   transform: skew(-30deg);
-  opacity: 0.8;
-  background-color: map-get($lsu, 'purple');
+  background-color: rgba(74, 24, 99, 0.8);
   box-shadow: 5px 3px 30px 3px $gray-800;
+}
+
+.chart-inner-content {
+  opacity: 1;
+  width: 900px;
+  height: 750px;
+  transform: skew(30deg);
+  left: 275px;
+  color: $white;
+  position: absolute;
+}
+
+.display-chart {
+  height: 750px !important;
+}
+
+.display-chart-title {
+  position: absolute;
+  color: $white;
+  left: 310px;
+  top: 20px;
+  font-size: 32px;
 }

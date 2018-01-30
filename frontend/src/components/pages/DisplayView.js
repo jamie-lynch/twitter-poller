@@ -29,7 +29,9 @@ class DisplayView extends Component {
   }
 
   componentWillUnmount() {
-    this.ws.close()
+    if (this.ws) {
+      this.ws.close()
+    }
   }
 
   setInitialState() {
@@ -72,55 +74,68 @@ class DisplayView extends Component {
   }
 
   getOptions() {
-    let total = this.state.leftCount + this.state.rightCount || 1
-    let left = Math.round(this.state.leftCount / total)
-    let right = Math.round(this.state.rightCount / total)
     let options = {
       tooltip: {
         trigger: 'item',
-        formatter: '{a} <br/>{b}: {c} ({d}%)'
-      },
-      legend: {
-        orient: 'vertical',
-        x: 'left',
-        data: [this.state.leftHashtag, this.state.rightHashtag]
+        formatter: '{b} - {c} ({d}%)'
       },
       series: [
         {
-          name: 'hashtags',
+          name: 'Tweet Count',
           type: 'pie',
-          radius: ['50%', '70%'],
-          avoidLabelOverlap: false,
+          radius: '55%',
+          center: ['50%', '50%'],
+          data: [
+            {
+              value: this.state.leftCount,
+              name: `#${this.state.leftHashtag}`,
+              itemStyle: {
+                normal: {
+                  color: '#e5007d',
+                  shadowBlur: 200,
+                  shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+              }
+            },
+            {
+              value: this.state.rightCount,
+              name: `#${this.state.rightHashtag}`,
+              itemStyle: {
+                normal: {
+                  color: '#575756',
+                  shadowBlur: 200,
+                  shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+              }
+            }
+          ].sort(function(a, b) {
+            return a.value - b.value
+          }),
+          roseType: 'radius',
           label: {
             normal: {
-              show: false,
-              position: 'center'
-            },
-            emphasis: {
-              show: true,
               textStyle: {
-                fontSize: '30',
-                fontWeight: 'bold'
+                color: '#fff',
+                fontSize: '18'
               }
             }
           },
           labelLine: {
             normal: {
-              show: false
+              lineStyle: {
+                color: '#fff'
+              },
+              smooth: 0.2,
+              length: 10,
+              length2: 20
             }
           },
-          data: [
-            {
-              value: left,
-              name: this.state.leftHashtag,
-              itemStyle: { color: '#575756', opacity: 1 }
-            },
-            {
-              value: right,
-              name: this.state.rightHashtag,
-              itemStyle: { color: '#e5007D', opacity: 1 }
-            }
-          ]
+
+          animationType: 'scale',
+          animationEasing: 'elasticOut',
+          animationDelay: function(idx) {
+            return Math.random() * 200
+          }
         }
       ]
     }
@@ -134,6 +149,7 @@ class DisplayView extends Component {
 
     return (
       <div className="display">
+        {/* HEADER */}
         <div className="display-header">
           <div className="display-title-bar">
             <div className="display-title-first">
@@ -152,11 +168,21 @@ class DisplayView extends Component {
         <img className="display-logo" src="/images/logo3d.png" alt="logo" />
 
         <div className="display-content">
-          <div className="display-chart-container" />
-          <div className="display-tweet-container">
-            <div className="content-square" />
-            <div className="right-angle" />
+          {/* CHART */}
+          <div className="display-chart-container">
+            <div className="chart-inner-content">
+              <span className="display-chart-title">Your tweets so far...</span>
+              <ReactEcharts
+                className="display-chart"
+                option={this.getOptions()}
+                notMerge={true}
+                lazyUpdate={true}
+              />
+            </div>
           </div>
+
+          {/* TWEETS */}
+          <div className="display-tweet-container" />
         </div>
       </div>
     )
