@@ -93,6 +93,7 @@
   font-size: 2em;
   font-family: 'Roboto', cursive;
   color: $white;
+  padding-right: 30px;
 }
 
 .display-title-text-2 {
@@ -138,6 +139,7 @@
   transform: skew(-30deg);
   background-color: rgba(74, 24, 99, 0.8);
   box-shadow: 5px 3px 30px 3px $gray-800;
+  padding-top: 60px;
 }
 
 .chart-inner-content {
@@ -157,7 +159,18 @@
 .display-chart-title {
   position: absolute;
   color: $white;
-  left: 310px;
+  left: 360px;
   top: 20px;
   font-size: 32px;
+  font-weight: bold;
+}
+
+.display-tweets-title {
+  transform: skew(30deg);
+  position: absolute;
+  color: $white;
+  left: 260px;
+  top: 20px;
+  font-size: 32px;
+  font-weight: bold;
 }

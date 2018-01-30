@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import request from 'superagent'
-import { Loader } from '../../components'
+import { Loader, DisplayTweet } from '../../components'
 import ReactEcharts from 'echarts-for-react'
 
 class DisplayView extends Component {
@@ -159,7 +159,6 @@ class DisplayView extends Component {
             <div className="display-title-join-2" />
             <div className="display-title-second">
               <div className="display-title-text-2">#LSUMatchReport</div>
-              <i className="fab fa-twitter mr-2 fa-2x twitter-blue" />
             </div>
             <div className="display-title-end-1" />
             <div className="display-title-end-2" />
@@ -171,7 +170,7 @@ class DisplayView extends Component {
           {/* CHART */}
           <div className="display-chart-container">
             <div className="chart-inner-content">
-              <span className="display-chart-title">Your tweets so far...</span>
+              <span className="display-chart-title">Poll Results</span>
               <ReactEcharts
                 className="display-chart"
                 option={this.getOptions()}
@@ -182,7 +181,14 @@ class DisplayView extends Component {
           </div>
 
           {/* TWEETS */}
-          <div className="display-tweet-container" />
+          <div className="display-tweet-container">
+            <span className="display-tweets-title">Your Tweets</span>
+            <DisplayTweet index={0} tweet={this.state.tweets[0]} />
+            <DisplayTweet index={1} tweet={this.state.tweets[1]} />
+            <DisplayTweet index={2} tweet={this.state.tweets[2]} />
+            <DisplayTweet index={3} tweet={this.state.tweets[3]} />
+            <DisplayTweet index={4} tweet={this.state.tweets[4]} />
+          </div>
         </div>
       </div>
     )

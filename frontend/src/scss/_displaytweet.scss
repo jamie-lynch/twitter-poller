@@ -1,0 +1,42 @@
+.display-tweet {
+  background: rgba(230, 0, 126, 0.9);
+  box-shadow: 5px 3px 10px 3px;
+  margin: 35px 0px;
+  height: 90px;
+}
+
+.display-tweet-header {
+  background: $white;
+  display: inline-block;
+}
+
+.display-tweet-header-inner {
+  transform: skew(30deg);
+}
+
+.display-tweet-name {
+  font-weight: bold;
+}
+
+.display-tweet-username {
+  color: $gray-600;
+}
+
+.display-tweet-content-inner {
+  transform: skew(30deg);
+  height: 65px;
+  margin-left: 25px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-content: center;
+  font-size: 18px;
+  align-items: center;
+}
+
+.display-tweet-user-image {
+  height: 50px;
+  width: 50px;
+  border-radius: 25px;
+  transform: translateY(-10px);
+}
