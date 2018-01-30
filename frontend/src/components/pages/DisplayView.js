@@ -183,11 +183,10 @@ class DisplayView extends Component {
           {/* TWEETS */}
           <div className="display-tweet-container">
             <span className="display-tweets-title">Your Tweets</span>
-            <DisplayTweet index={0} tweet={this.state.tweets[0]} />
-            <DisplayTweet index={1} tweet={this.state.tweets[1]} />
-            <DisplayTweet index={2} tweet={this.state.tweets[2]} />
-            <DisplayTweet index={3} tweet={this.state.tweets[3]} />
-            <DisplayTweet index={4} tweet={this.state.tweets[4]} />
+            {Array.isArray(this.state.tweets) &&
+              this.state.tweets.slice(0, 5).map((tweet, index) => {
+                return <DisplayTweet key={index} index={index} tweet={tweet} />
+              })}
           </div>
         </div>
       </div>
