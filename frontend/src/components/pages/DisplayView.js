@@ -20,10 +20,16 @@ class DisplayView extends Component {
       active: false,
       loading: true
     }
+
+    this.ws = null
   }
 
   componentDidMount() {
     this.setInitialState()
+  }
+
+  componentWillUnmount() {
+    this.ws.close()
   }
 
   setInitialState() {
@@ -36,7 +42,7 @@ class DisplayView extends Component {
           rightCount: res.body.rightCount,
           leftHashtag: res.body.leftHashtag,
           rightHashtag: res.body.rightHashtag,
-          tweets: res.body.presenterTweets,
+          tweets: res.body.displayTweets,
           active: res.body.active,
           loading: false
         })

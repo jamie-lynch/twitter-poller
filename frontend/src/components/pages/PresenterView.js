@@ -22,10 +22,16 @@ class PresenterView extends Component {
       active: false,
       loading: true
     }
+
+    this.ws = null
   }
 
   componentDidMount() {
     this.setInitialState()
+  }
+
+  componentWillUnmount() {
+    this.ws.close()
   }
 
   setInitialState() {

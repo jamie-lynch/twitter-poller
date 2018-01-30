@@ -41,10 +41,16 @@ class MainController extends Component {
       displayTweets: [],
       shortlistModal: null
     }
+
+    this.ws = null
   }
 
   componentDidMount() {
     this.setInitialState()
+  }
+
+  componentWillUnmount() {
+    this.ws.close()
   }
 
   setInitialState() {
