@@ -9,7 +9,8 @@ import {
   Counter,
   Loader,
   MainControls,
-  ShortlistModal
+  ShortlistModal,
+  ConfirmStartStopModal
 } from '../../components'
 
 class MainController extends Component {
@@ -20,12 +21,13 @@ class MainController extends Component {
     this.listen = this.listen.bind(this)
     this.startPoll = this.startPoll.bind(this)
     this.endPoll = this.endPoll.bind(this)
-    this.handleClick = this.handleClick.bind(this)
     this.handleChange = this.handleChange.bind(this)
     this.onIconClick = this.onIconClick.bind(this)
     this.clearTweetList = this.clearTweetList.bind(this)
     this.toggleModal = this.toggleModal.bind(this)
     this.sortAndFilter = this.sortAndFilter.bind(this)
+    this.confirm = this.confirm.bind(this)
+    this.cancel = this.cancel.bind(this)
 
     this.state = {
       // Available values: 'Start' | 'Stop'
@@ -40,7 +42,8 @@ class MainController extends Component {
       loading: true,
       presenterTweets: [],
       displayTweets: [],
-      shortlistModal: null
+      shortlistModal: null,
+      confirmAction: null
     }
 
     this.ws = null
@@ -216,7 +219,8 @@ class MainController extends Component {
               active: true,
               buttonState: 'Stop',
               presenterTweets: [],
-              displayTweets: []
+              displayTweets: [],
+              loading: false
             })
           } else {
             this.setState({ active: false, buttonState: 'Start' })
@@ -229,6 +233,7 @@ class MainController extends Component {
   }
 
   startPoll() {
+    this.setState({ confirmAction: null, loading: true })
     request
       .post(`//${process.env.REACT_APP_BACKEND_API}/start-poll`)
       .set({ 'Content-Type': 'application/json' })
@@ -242,6 +247,7 @@ class MainController extends Component {
   }
 
   endPoll() {
+    this.setState({ confirmAction: null })
     request
       .post(`//${process.env.REACT_APP_BACKEND_API}/stop-poll`)
       .end((err, res) => {
@@ -249,25 +255,12 @@ class MainController extends Component {
       })
   }
 
-  handleClick() {
-    this.setState(prevState => {
-      if (prevState.buttonState === 'Start') {
-        this.startPoll()
-        return {
-          buttonState: 'Stop',
-          active: true,
-          leftTweets: [],
-          rightTweets: [],
-          leftCount: 0,
-          rightCount: 0,
-          presenterTweets: [],
-          displayTweets: []
-        }
-      } else {
-        this.endPoll()
-        return { buttonState: 'Start', active: false }
-      }
-    })
+  confirm(action) {
+    this.setState({ confirmAction: action })
+  }
+
+  cancel() {
+    this.setState({ confirmAction: null })
   }
 
   handleChange(event) {
@@ -407,7 +400,7 @@ class MainController extends Component {
                     this.state.buttonState === 'Start' &&
                     (!this.state.leftHashtag || !this.state.rightHashtag)
                   }
-                  onClick={this.handleClick}
+                  onClick={() => this.confirm(this.state.buttonState)}
                 >
                   {this.state.buttonState}
                 </button>
@@ -491,6 +484,14 @@ class MainController extends Component {
           tweets={this.state.displayTweets}
           onIconClick={this.onIconClick}
           clear={this.clearTweetList}
+        />
+        <ConfirmStartStopModal
+          open={!!this.state.confirmAction}
+          toggle={this.cancel}
+          action={this.state.confirmAction}
+          confirm={
+            this.state.confirmAction === 'Start' ? this.startPoll : this.endPoll
+          }
         />
       </div>
     )

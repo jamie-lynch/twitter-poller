@@ -10,3 +10,7 @@ export { default as Loader } from './elements/Loader'
 export { default as MainControls } from './elements/MainControls'
 export { default as ShortlistModal } from './elements/ShortlistModal'
 export { default as DisplayTweet } from './elements/DisplayTweet'
+export { default as ConfirmClearModal } from './elements/ConfirmClearModal'
+export {
+  default as ConfirmStartStopModal
+} from './elements/ConfirmStartStopModal'
