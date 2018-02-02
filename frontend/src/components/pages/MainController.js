@@ -367,7 +367,7 @@ class MainController extends Component {
     return (
       <div className="MainController">
         {header}
-        <div className="container">
+        <div className="container mb-5 pb-3">
           <div className="row">
             <div className="col-sm-5">
               <div className="input-group mb-3">
