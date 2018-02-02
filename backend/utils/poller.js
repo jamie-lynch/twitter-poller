@@ -121,14 +121,19 @@ const fetchData = (hashtag, since) => {
   let statuses = []
 
   var getPage = (hashtag = null, since = null, next_results = null) => {
-    return twitter.getTweets(hashtag, since, next_results).then(tweets => {
-      statuses = statuses.concat(tweets.statuses)
-      if (tweets.search_metadata.next_results) {
-        return getPage(null, since, tweets.search_metadata.next_results)
-      } else {
-        return { statuses, search_metadata: tweets.search_metadata }
-      }
-    })
+    return twitter
+      .getTweets(hashtag, since, next_results)
+      .then(tweets => {
+        statuses = statuses.concat(tweets.statuses)
+        if (tweets.search_metadata.next_results) {
+          return getPage(null, since, tweets.search_metadata.next_results)
+        } else {
+          return { statuses, search_metadata: tweets.search_metadata }
+        }
+      })
+      .catch(error => {
+        return { statuses: [], search_metadata: {} }
+      })
   }
 
   return getPage(hashtag, since)
