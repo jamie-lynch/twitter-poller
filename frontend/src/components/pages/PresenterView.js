@@ -114,7 +114,7 @@ class PresenterView extends Component {
 
   render() {
     let header = (
-      <div className="header d-flex flex-column align-items-center mb-4">
+      <div className="header d-flex flex-column align-items-center mb-4 mt-3">
         <h1>Twitter Poller</h1>
         <p>Survey opinions by counting tweets</p>
         <h4>Presenter View</h4>

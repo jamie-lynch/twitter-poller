@@ -63,7 +63,6 @@ class MainController extends Component {
       .use(noCache)
       .set({ 'Content-Type': 'application/json' })
       .end((err, res) => {
-        console.log(err, res)
         let pres = res.body.presenterTweets.slice()
         let display = res.body.displayTweets.slice()
 
@@ -351,7 +350,7 @@ class MainController extends Component {
     var { leftTweets, rightTweets } = this.sortAndFilter()
 
     let header = (
-      <div className="header d-flex flex-column align-items-center mb-4">
+      <div className="header d-flex flex-column align-items-center mb-4 mt-3">
         <h1>Twitter Poller</h1>
         <p>Survey opinions by counting tweets</p>
       </div>
