@@ -1,6 +1,7 @@
 // utils
 import React, { Component } from 'react'
 import request from 'superagent'
+import noCache from 'superagent-no-cache'
 
 // components
 import {
@@ -56,8 +57,10 @@ class MainController extends Component {
   setInitialState() {
     request
       .get(`//${process.env.REACT_APP_BACKEND_API}/get-poll-data`)
+      .use(noCache)
       .set({ 'Content-Type': 'application/json' })
       .end((err, res) => {
+        console.log(err, res)
         let pres = res.body.presenterTweets.slice()
         let display = res.body.displayTweets.slice()
 

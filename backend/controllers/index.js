@@ -8,7 +8,10 @@ exports.index = function(req, res, next) {
 
 exports.getPollData = function(req, res, next) {
   Poll.get().then(poll => {
-    return res.status(200).json(poll)
+    return res
+      .header('Cache-Control', 'no-cache')
+      .status(200)
+      .json(poll)
   })
 }
 
@@ -38,7 +41,10 @@ exports.stopPoll = function(req, res, next) {
 
 exports.getPresenterData = function(req, res, next) {
   Poll.getPresenterData().then(data => {
-    return res.status(200).json(Object.assign(data, { success: true }))
+    return res
+      .header('Cache-Control', 'no-cache')
+      .status(200)
+      .json(Object.assign(data, { success: true }))
   })
 }
 
@@ -51,7 +57,10 @@ exports.setPresenterData = function(req, res, next) {
 
 exports.getDisplayData = function(req, res, next) {
   Poll.getDisplayData().then(data => {
-    return res.status(200).json(Object.assign(data, { success: true }))
+    return res
+      .header('Cache-Control', 'no-cache')
+      .status(200)
+      .json(Object.assign(data, { success: true }))
   })
 }
 

@@ -1,6 +1,7 @@
 // utils
 import React, { Component } from 'react'
 import request from 'superagent'
+import noCache from 'superagent-no-cache'
 
 // components
 import { Tweet, Counter, Loader } from '../../components'
@@ -37,6 +38,7 @@ class PresenterView extends Component {
   setInitialState() {
     request
       .get(`//${process.env.REACT_APP_BACKEND_API}/get-presenter-data`)
+      .use(noCache)
       .set({ 'Content-Type': 'application/json' })
       .end((err, res) => {
         this.setState({

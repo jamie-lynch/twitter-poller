@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import request from 'superagent'
 import { Loader, DisplayTweet } from '../../components'
 import ReactEcharts from 'echarts-for-react'
+import noCache from 'superagent-no-cache'
 
 class DisplayView extends Component {
   constructor(props) {
@@ -37,7 +38,7 @@ class DisplayView extends Component {
   setInitialState() {
     request
       .get(`//${process.env.REACT_APP_BACKEND_API}/get-display-data`)
-      .set({ 'Content-Type': 'application/json' })
+      .use(noCache)
       .end((err, res) => {
         this.setState({
           leftCount: res.body.leftCount,
