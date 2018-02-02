@@ -109,7 +109,7 @@ const poll = () => {
     .then(() => {
       setTimeout(() => {
         poll()
-      }, 10000)
+      }, process.env.POLL_RATE)
       return
     })
     .catch(err => {
