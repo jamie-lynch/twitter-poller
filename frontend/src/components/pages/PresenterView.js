@@ -62,15 +62,32 @@ class PresenterView extends Component {
       var msg = JSON.parse(received.data)
       var { type, data } = msg
 
-      if (type === 'presenter') {
-        this.setState({ tweets: data })
-      } else if (type === 'main') {
-        this.setState(prevState => {
-          return {
-            leftCount: (prevState.leftCount += data.newLeftTweets.length),
-            rightCount: (prevState.rightCount += data.newRightTweets.length)
+      switch (type) {
+        case 'presenter':
+          this.setState({ tweets: data })
+          break
+        case 'main':
+          this.setState(prevState => {
+            return {
+              leftCount: (prevState.leftCount += data.newLeftTweets.length),
+              rightCount: (prevState.rightCount += data.newRightTweets.length)
+            }
+          })
+          break
+        case 'start-stop':
+          if (data.active) {
+            this.setState({
+              leftHashtag: data.leftHashtag,
+              rightHashtag: data.rightHashtag,
+              leftCount: 0,
+              rightCount: 0,
+              tweets: [],
+              active: true
+            })
           }
-        })
+          break
+        default:
+          break
       }
     }
   }
