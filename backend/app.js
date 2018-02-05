@@ -1,3 +1,6 @@
+// turn .env file into environment variables
+require('dotenv').config()
+
 var express = require('express')
 var path = require('path')
 var favicon = require('serve-favicon')
@@ -6,9 +9,6 @@ var cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
 var mongoose = require('mongoose')
 var Poll = require('./models/poll')
-
-// turn .env file into environment variables
-require('dotenv').config()
 
 // setup twitter client
 var twitter = require('./utils/twitter')

@@ -1,6 +1,8 @@
 var mongoose = require('mongoose')
 var Schema = mongoose.Schema
 
+const limit = 0 - process.env.TWEET_LIMIT
+
 var pollSchema = new Schema({
   leftHashtag: { type: String, default: '', maxlength: 255 },
   rightHashtag: { type: String, default: '', maxlength: 255 },
@@ -42,7 +44,10 @@ pollSchema.statics.create = () => {
 
 pollSchema.statics.get = (tweets = false) => {
   return new Promise((resolve, reject) => {
-    Poll.find()
+    Poll.find(
+      {},
+      { leftTweets: { $slice: limit }, rightTweets: { $slice: limit } }
+    )
       .then(polls => {
         return resolve(polls[0])
       })

@@ -47,6 +47,7 @@ class MainController extends Component {
     }
 
     this.ws = null
+    this.tweetLimit = process.env.REACT_APP_TWEET_LIMIT
   }
 
   componentDidMount() {
@@ -128,9 +129,26 @@ class MainController extends Component {
       switch (type) {
         case 'main':
           this.setState(prevState => {
+            let leftTweets = prevState.leftTweets
+            let rightTweets = prevState.rightTweets
+            leftTweets = leftTweets.concat(data.newLeftTweets)
+            rightTweets = rightTweets.concat(data.newRightTweets)
+
+            if (leftTweets.length > this.tweetLimit) {
+              leftTweets = leftTweets.splice(
+                leftTweets.length - this.tweetLimit
+              )
+            }
+
+            if (rightTweets.length > this.tweetLimit) {
+              rightTweets = rightTweets.splice(
+                rightTweets.length - this.tweetLimit
+              )
+            }
+
             return {
-              leftTweets: prevState.leftTweets.concat(data.newLeftTweets),
-              rightTweets: prevState.rightTweets.concat(data.newRightTweets),
+              leftTweets: leftTweets,
+              rightTweets: rightTweets,
               leftCount: (prevState.leftCount += data.newLeftTweets.length),
               rightCount: (prevState.rightCount += data.newRightTweets.length)
             }
@@ -276,13 +294,15 @@ class MainController extends Component {
 
       let tweets = left ? prevState.leftTweets : prevState.rightTweets
 
-      tweets[index][icon] = !tweets[index][icon]
+      if (index > -1) {
+        tweets[index][icon] = !tweets[index][icon]
+      }
 
       let returnVal = left ? 'leftTweets' : 'rightTweets'
       let returnObj = { [returnVal]: tweets }
 
       let subTweets = prevState[`${icon}Tweets`]
-      if (tweets[index][icon]) {
+      if (index > -1 && tweets[index][icon]) {
         subTweets.push(tweets[index])
       } else {
         subTweets.splice(subTweets.findIndex(tweet => tweet.id === id), 1)
