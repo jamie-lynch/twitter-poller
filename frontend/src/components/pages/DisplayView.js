@@ -37,7 +37,7 @@ class DisplayView extends Component {
 
   setInitialState() {
     request
-      .get(`//${process.env.REACT_APP_BACKEND_API}/get-display-data`)
+      .get(`//${window.location.hostname}:3001/get-display-data`)
       .use(noCache)
       .end((err, res) => {
         this.setState({
@@ -49,9 +49,7 @@ class DisplayView extends Component {
           active: res.body.active,
           loading: false
         })
-        this.ws = new window.WebSocket(
-          `ws://${process.env.REACT_APP_BACKEND_API}`
-        )
+        this.ws = new window.WebSocket(`ws://${window.location.hostname}:3001`)
         this.listen(this.ws)
       })
   }

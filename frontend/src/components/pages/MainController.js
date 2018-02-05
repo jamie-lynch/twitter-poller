@@ -59,7 +59,7 @@ class MainController extends Component {
 
   setInitialState() {
     request
-      .get(`//${process.env.REACT_APP_BACKEND_API}/get-poll-data`)
+      .get(`//${window.location.hostname}:3001/get-poll-data`)
       .use(noCache)
       .set({ 'Content-Type': 'application/json' })
       .end((err, res) => {
@@ -115,9 +115,7 @@ class MainController extends Component {
           active: res.body.active,
           loading: false
         })
-        this.ws = new window.WebSocket(
-          `ws://${process.env.REACT_APP_BACKEND_API}`
-        )
+        this.ws = new window.WebSocket(`ws://${window.location.hostname}:3001`)
         this.listen(this.ws)
       })
   }
@@ -234,7 +232,7 @@ class MainController extends Component {
   startPoll() {
     this.setState({ confirmAction: null, loading: true })
     request
-      .post(`//${process.env.REACT_APP_BACKEND_API}/start-poll`)
+      .post(`//${window.location.hostname}:3001/start-poll`)
       .set({ 'Content-Type': 'application/json' })
       .send({
         leftHashtag: this.state.leftHashtag,
@@ -248,7 +246,7 @@ class MainController extends Component {
   endPoll() {
     this.setState({ confirmAction: null })
     request
-      .post(`//${process.env.REACT_APP_BACKEND_API}/stop-poll`)
+      .post(`//${window.location.hostname}:3001/stop-poll`)
       .end((err, res) => {
         return
       })
@@ -292,7 +290,7 @@ class MainController extends Component {
       returnObj[`${icon}Tweets`] = subTweets
 
       request
-        .post(`//${process.env.REACT_APP_BACKEND_API}/set-${icon}-data`)
+        .post(`//${window.location.hostname}:3001/set-${icon}-data`)
         .set({ 'Content-Type': 'application/json' })
         .send({ tweets: subTweets })
         .end((err, res) => {
@@ -320,7 +318,7 @@ class MainController extends Component {
       tweetLists[list] = []
 
       request
-        .post(`//${process.env.REACT_APP_BACKEND_API}/set-${list}-data`)
+        .post(`//${window.location.hostname}:3001/set-${list}-data`)
         .set({ 'Content-Type': 'application/json' })
         .send({ tweets: [] })
         .end((err, res) => {

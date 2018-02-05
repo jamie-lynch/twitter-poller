@@ -1,0 +1,32 @@
+version: '3.2'
+
+services:
+  twitter-poller-frontend:
+    container_name: twitter-poller-frontend
+    ports:
+      - 3000:3000
+      - 80:3000
+    build: ./frontend
+    depends_on:
+      - twitter-poller-backend
+
+  twitter-poller-backend:
+    container_name: twitter-poller-backend
+    ports:
+      - 3001:3001
+    build: ./backend
+    depends_on:
+      - twitter-poller-mongodb
+
+  twitter-poller-mongodb:
+    container_name: twitter-poller-mongodb
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    volumes:
+      - type: volume
+        source: twitter-poller-mongodb
+        target: /data/db
+
+volumes:
+  twitter-poller-mongodb:

@@ -17,7 +17,7 @@ twitter.createTwitterClient()
 // connect to db
 mongoose.Promise = require('bluebird')
 mongoose
-  .connect(process.env.DB_ADDRESS, { useMongoClient: true })
+  .connect(`${process.env.DB_ADDRESS}`, { useMongoClient: true })
   .catch(err => {
     console.error(err)
   })

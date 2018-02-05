@@ -37,7 +37,7 @@ class PresenterView extends Component {
 
   setInitialState() {
     request
-      .get(`//${process.env.REACT_APP_BACKEND_API}/get-presenter-data`)
+      .get(`//${window.location.hostname}:3001/get-presenter-data`)
       .use(noCache)
       .set({ 'Content-Type': 'application/json' })
       .end((err, res) => {
@@ -50,9 +50,7 @@ class PresenterView extends Component {
           active: res.body.active,
           loading: false
         })
-        this.ws = new window.WebSocket(
-          `ws://${process.env.REACT_APP_BACKEND_API}`
-        )
+        this.ws = new window.WebSocket(`ws://${window.location.hostname}:3001`)
         this.listen(this.ws)
       })
   }
@@ -100,7 +98,7 @@ class PresenterView extends Component {
         tweets.splice(index, 1)
 
         request
-          .post(`//${process.env.REACT_APP_BACKEND_API}/set-presenter-data`)
+          .post(`//${window.location.hostname}:3001/set-presenter-data`)
           .set({ 'Content-Type': 'application/json' })
           .send({ tweets })
           .end((err, res) => {
